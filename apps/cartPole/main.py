@@ -6,9 +6,10 @@ import numpy as np
 from utils  import DQNAgent
 
 
-def learning(env, path, episodes, timesteps, batchSize=32, saving=False,verbose=False):
+def learning(env, path, episodes, timesteps, batchSize=32, saving=False, verbose=False):
     # DEFINIR EL AGENTE
     agent = DQNAgent(stateSize=env.observation_space.shape[0], actionSize=env.action_space.n, verbose=verbose)
+ 
     # para cada epoca de entrenamiento
     for episode in range(episodes):
         if verbose:
@@ -65,7 +66,7 @@ if __name__ == "__main__":
     learning(env=gym.make('CartPole-v0'),
              path=os.path.join(dirPath, 'cartpole-dqn.h5'),
              episodes=10,
-             timesteps=100,
+             timesteps=1000,
              batchSize=32,
              saving=True,
              verbose=True)

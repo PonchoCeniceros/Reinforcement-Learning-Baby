@@ -1,7 +1,3 @@
-import os
-# no mostrar alertas de tensorflow
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
 import random
 import numpy as np
 import tensorflow as tf
@@ -30,6 +26,10 @@ class DQNAgent:
         # reservamos memoria para almacenar los estados requeridos para el
         # aprendizaje
         self._memory = deque(maxlen=2000)
+        # valores referentes al exploration rate ó epsilon 
+        self.epsilon = 1.0
+        self.epsilonMin = 0.01
+        self.epsilonDecay = 0.995
 
     def _build_model(self):
         """ Se define el modelo de red neuronal que se empleará para el aprendizaje
@@ -55,9 +55,16 @@ class DQNAgent:
 
 
     def act(self, state):
+        # aleatoriamente regresamos una acción aleatoria para ayudar al
+        # agente a que no caiga en un minimo local
+        if np.random.rand() <= self.epsilon:
+            return random.randrange(self.actionSize)
+
         # generamos nuestros Q-values mediante la predicción con nuestro modelo
         QValues = self.model.predict(state)
-        if self.verbose: print('QValues:', QValues, end=' ')
+        if self.verbose:
+            print('QValues:', QValues, end=' ')
+        
         # retornamos la mejor accion generada
         return np.argmax(QValues[0])
 
@@ -115,6 +122,10 @@ class DQNAgent:
             target_f[0][action] = target
             # con los Q-values como target, entrenamos nuestro modelos
             self.model.fit(state, target_f, epochs=1, verbose=0)
+        
+        # disminuir el exploration rate apulatinamente
+        if self.epsilon > self.epsilonMin:
+            self.epsilon *= self.epsilonDecay
 
 
 # https://github.com/gelanat/reinforcement-learning/blob/master/SARSA.ipynb
