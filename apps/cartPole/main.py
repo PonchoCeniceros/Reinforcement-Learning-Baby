@@ -1,15 +1,18 @@
 import os
+from pathlib import Path
+
 import gym
 import numpy as np
 from utils  import DQNAgent
 
 
-def learning(env, episodes, timesteps, batchSize=32, verbose=False):
+def learning(env, path, episodes, timesteps, batchSize=32, saving=False,verbose=False):
     # DEFINIR EL AGENTE
     agent = DQNAgent(stateSize=env.observation_space.shape[0], actionSize=env.action_space.n, verbose=verbose)
     # para cada epoca de entrenamiento
     for episode in range(episodes):
-        if verbose: print('epoca:', episode)
+        if verbose:
+            print('epoca:', episode)
 
         # obtenemos el estado actual del ambiente y lo redimensionamos para
         # el modelo de aprendizaje del agente
@@ -44,6 +47,9 @@ def learning(env, episodes, timesteps, batchSize=32, verbose=False):
             # SI SE TIENEN LOS DATOS SUFICIENTES, ENTRENAR EL MODELO DEL AGENTE
             if agent.capacity() > batchSize:
                 agent.learn(batchSize)
+
+        if saving:
+            agent.save(path)
         # cerramos el ambiente
         env.close()
 
@@ -52,4 +58,14 @@ if __name__ == "__main__":
     # cambiando color de la consola, sin utilidad en el ejercicio
     os.system('color 3')
 
-    learning(env=gym.make('CartPole-v0'), episodes=10, timesteps=100, batchSize=55, verbose=True)
+    dirPath = os.path.join(Path(__file__).parent, 'data')
+    if not os.path.exists(dirPath):
+        os.makedirs(dirPath, exist_ok=True)
+
+    learning(env=gym.make('CartPole-v0'),
+             path=os.path.join(dirPath, 'cartpole-dqn.h5'),
+             episodes=10,
+             timesteps=100,
+             batchSize=32,
+             saving=True,
+             verbose=True)

@@ -75,6 +75,22 @@ class DQNAgent:
         """
         self._memory.append((state, action, reward, newState, done))
 
+    def load(self, filename):
+        """ Cargar una matriz de pesos en el modelo
+
+        Args:
+            filename (string): nombre del archivo con la matriz de pesos
+        """
+        self.model.load_weights(filename)
+
+    def save(self, filename):
+        """ Guardar la matriz de pesos actual del modelo
+
+        Args:
+            filename (string): nombre del archivo con la matriz de pesos
+        """
+        self.model.save_weights(filename)
+
 
     def learn(self, batchSize, gamma=0.95):
         """ Entrenar el modelo en base a la memoria acumulada del agente
